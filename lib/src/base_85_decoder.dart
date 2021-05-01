@@ -19,12 +19,13 @@ var DUO85 = pow(85, 2);
 var SING85 = 85;
 
 class Base85Decoder extends Converter<String, Uint8List> {
-  String alphabet;
-  AlgoType algo;
-  Uint8List _baseMap;
+  final String alphabet;
+  final AlgoType algo;
+  final Uint8List _baseMap;
 
-  Base85Decoder(this.alphabet, this.algo) {
-    _baseMap = Uint8List(256);
+  Base85Decoder(this.alphabet, this.algo)
+      : _baseMap = Uint8List(256)
+  {
     _baseMap.fillRange(0, _baseMap.length, 255);
     for (var i = 0; i < alphabet.length; i++) {
       var xc = alphabet.codeUnitAt(i);
@@ -44,11 +45,11 @@ class Base85Decoder extends Converter<String, Uint8List> {
   ///
   /// The [input] to decode. May be a String.
   /// If ascii85, it is expected to be enclosed in <~ and ~>.
-  Uint8List convert(String input) {
+  Uint8List convert(String? input) {
     if (input?.isEmpty ?? true) {
       return Uint8List(0);
     }
-    var bytes = Uint8List.fromList(input.codeUnits);
+    var bytes = Uint8List.fromList(input!.codeUnits);
     var dataLength = bytes.length;
     if (algo == AlgoType.ascii85) {
       dataLength -= (ASCII85_ENC_START.length + ASCII85_ENC_END.length);
@@ -77,23 +78,23 @@ class Base85Decoder extends Converter<String, Uint8List> {
 
     var writeIndex = 0;
     for (var i = bufferStart; i < bufferEnd;) {
-      var num = 0;
+      num number = 0;
       var starti = i;
 
       i = nextValidByte(i);
-      num = (_baseMap[bytes[i]]) * QUAD85;
+      number = (_baseMap[bytes[i]]) * QUAD85;
 
       i = nextValidByte(i + 1);
-      num += (i >= bufferEnd ? 84 : _baseMap[bytes[i]]) * TRIO85;
+      number += (i >= bufferEnd ? 84 : _baseMap[bytes[i]]) * TRIO85;
 
       i = nextValidByte(i + 1);
-      num += (i >= bufferEnd ? 84 : _baseMap[bytes[i]]) * DUO85;
+      number += (i >= bufferEnd ? 84 : _baseMap[bytes[i]]) * DUO85;
 
       i = nextValidByte(i + 1);
-      num += (i >= bufferEnd ? 84 : _baseMap[bytes[i]]) * SING85;
+      number += (i >= bufferEnd ? 84 : _baseMap[bytes[i]]) * SING85;
 
       i = nextValidByte(i + 1);
-      num += (i >= bufferEnd ? 84 : _baseMap[bytes[i]]);
+      number += (i >= bufferEnd ? 84 : _baseMap[bytes[i]]);
 
       i = nextValidByte(i + 1);
 
@@ -101,13 +102,15 @@ class Base85Decoder extends Converter<String, Uint8List> {
         throw FormatException('Wrong length');
       }
 
-      if (num > NUM_MAX_VALUE || num < 0) {
+      if (number > NUM_MAX_VALUE || number < 0) {
         throw FormatException('Bogus data');
       }
-      result[writeIndex] = (num >> 24);
-      result[writeIndex + 1] = (num >> 16);
-      result[writeIndex + 2] = (num >> 8);
-      result[writeIndex + 3] = (num & 0xff);
+
+      var numberInt = number as int;
+      result[writeIndex] = (numberInt >> 24);
+      result[writeIndex + 1] = (numberInt >> 16);
+      result[writeIndex + 2] = (numberInt >> 8);
+      result[writeIndex + 3] = (numberInt & 0xff);
       writeIndex += 4;
     }
 
