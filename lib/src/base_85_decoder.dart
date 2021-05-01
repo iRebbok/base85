@@ -23,9 +23,7 @@ class Base85Decoder extends Converter<String, Uint8List> {
   final AlgoType algo;
   final Uint8List _baseMap;
 
-  Base85Decoder(this.alphabet, this.algo)
-      : _baseMap = Uint8List(256)
-  {
+  Base85Decoder(this.alphabet, this.algo) : _baseMap = Uint8List(256) {
     _baseMap.fillRange(0, _baseMap.length, 255);
     for (var i = 0; i < alphabet.length; i++) {
       var xc = alphabet.codeUnitAt(i);
